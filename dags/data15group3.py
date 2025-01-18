@@ -31,7 +31,7 @@ def validity_check_starter(**kwargs):
 
     # Calculate number of workers needed
     total_jobs = len(df_jobs)
-    jobs_limit_per_worker = 120
+    jobs_limit_per_worker = Variable.get('jobs_limit_per_worker')
     num_workers = math.ceil(total_jobs / jobs_limit_per_worker)
     jobs_per_lambda = math.ceil(total_jobs / num_workers)
 
