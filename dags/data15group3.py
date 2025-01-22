@@ -1,5 +1,4 @@
 import json
-import math
 from datetime import timedelta
 
 from airflow import DAG
@@ -8,25 +7,24 @@ from airflow.operators.email import EmailOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
 from airflow.providers.amazon.aws.operators.lambda_function import LambdaInvokeFunctionOperator
-from airflow.providers.amazon.aws.operators.s3 import S3DeleteObjectsOperator
-from airflow.sensors.time_delta import TimeDeltaSensor
-from airflow.utils.task_group import TaskGroup
-from airflow.providers.snowflake.operators.snowflake import SQLExecuteQueryOperator
 from airflow.providers.amazon.aws.operators.step_function import (
     StepFunctionStartExecutionOperator,
     StepFunctionGetExecutionOutputOperator
 )
 from airflow.providers.amazon.aws.sensors.s3 import S3KeySensor
+from airflow.providers.snowflake.operators.snowflake import SQLExecuteQueryOperator
+from airflow.sensors.time_delta import TimeDeltaSensor
+from airflow.utils.task_group import TaskGroup
 
-from vectordb_utils import *
 from sqls import *
-
+from vectordb_utils import *
 
 datalake_bucket = "data15group3-job-data-lake"
 current_date = datetime.now(timezone.utc)
 year = current_date.strftime('%Y')
 month = current_date.strftime('%m')
 day = current_date.strftime('%d')
+
 
 ####################################################################################################
 # current_date = datetime(2025, 1, 5, 15, 30, tzinfo=timezone.utc)
@@ -76,16 +74,15 @@ def collect_lambda_results(task_ids, **kwargs):
     return "".join(results)
 
 
-
 with DAG(
         'linkedin_jobs_search',
         default_args={
             'owner': 'airflow',
             'depends_on_past': False,
             'email': Variable.get('my_email'),
-            'email_on_failure': True,
+            'email_on_failure': False,
             'email_on_retry': False,
-            'retries': 1,
+            'retries': 0,
             'retry_delay': timedelta(minutes=3),
         },
         description='Search LinkedIn jobs for different roles',
@@ -136,7 +133,7 @@ with DAG(
     with TaskGroup("check_job_validity_tasks") as check_job_validity_tasks:
         start_step_function = StepFunctionStartExecutionOperator(
             task_id='start_step_function',
-            state_machine_arn=Variable.get("secret_ValidityChecker_arn"),
+            state_machine_arn=Variable.get("ValidityChecker_Step_Function_Arn"),
             aws_conn_id=None,
             deferrable=True,
         )
