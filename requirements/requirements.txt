@@ -1,0 +1,17 @@
+# Core Airflow package
+apache-airflow
+
+# Specific provider packages for required integrations
+apache-airflow-providers-amazon
+apache-airflow-providers-github
+apache-airflow-providers-snowflake
+#apache-airflow-providers-mysql
+
+# Additional libraries (if required by your DAGs)
+pydantic
+pandas
+fastavro
+langchain
+langchain-openai
+langchain-pinecone
+pinecone

@@ -28,6 +28,7 @@ jobs:
         run: |
           aws s3 sync dags/ s3://data15group3-airflow/dags/
           aws s3 sync shells/ s3://data15group3-airflow/startup/
+          aws s3 sync requirements/ s3://data15group3-airflow/requirements/
         
         
 
