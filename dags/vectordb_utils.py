@@ -118,7 +118,7 @@ class VectorStorePipeline:
             pinecone_index_name: str,
     ):
         self.s3_bucket = s3_bucket
-        self.s3 = S3Hook(aws_conn_id="aws_conn")
+        self.s3 = S3Hook(aws_conn_id=None)
         self.embeddings = OpenAIEmbeddings(
             api_key=openai_api_key, model="text-embedding-3-large"
         )

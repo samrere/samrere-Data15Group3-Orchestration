@@ -116,7 +116,7 @@ with DAG(
                 "keyword": keyword
             }),
             invocation_type='Event',
-            aws_conn_id='aws_conn',
+            aws_conn_id=None,
             log_type='Tail'
         )
         task_ids.append(search_task.task_id)
@@ -127,7 +127,7 @@ with DAG(
         task_id='wait_for_avro_file',
         bucket_name=datalake_bucket,
         bucket_key=f'raw/{year}/{month}/{day}/Data_Engineer/Data_Engineer-{current_date.strftime("%Y%m%d")}.avro',
-        aws_conn_id='aws_conn',
+        aws_conn_id=None,
         deferrable=True
     )
     prev_task >> wait_for_avro_file
@@ -137,14 +137,14 @@ with DAG(
         start_step_function = StepFunctionStartExecutionOperator(
             task_id='start_step_function',
             state_machine_arn=Variable.get("secret_ValidityChecker_arn"),
-            aws_conn_id='aws_conn',
+            aws_conn_id=None,
             deferrable=True,
         )
 
         get_step_function_output = StepFunctionGetExecutionOutputOperator(
             task_id='get_step_function_output',
             execution_arn="{{ task_instance.xcom_pull(task_ids='check_job_validity_tasks.start_step_function') }}",
-            aws_conn_id='aws_conn',
+            aws_conn_id=None,
         )
 
         task_ids.append(get_step_function_output.task_id)
